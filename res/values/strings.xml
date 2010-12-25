@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, LogActivity!</string>
-    <string name="app_name">SamDock</string>
+  <string name="hello">Hello World, LogActivity!</string>
+  <string name="app_name">SamDock</string>
+  <string name="prefs_title">SamDock Preferences</string>
+  <string name="enabled">Enabled</string>
 </resources>
