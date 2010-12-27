@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2010 Michael Imamura
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package org.lugatgt.org.zoogie.samdock;
 
 import android.app.Service;
@@ -21,7 +37,20 @@ public class PowerService extends Service {
         
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         if (prefs.getBoolean("enabled", true)) {
-            launch();
+            LaunchType launchType = LaunchType.fromCode(prefs.getString("launchType", null));
+            if (launchType == null) launchType = LaunchType.AUTO_CLOCK;
+            
+            switch (launchType) {
+                case AUTO_CLOCK:
+                    launchAutoClock();
+                    break;
+                    
+                case APP:
+                    //TODO
+                    
+                default:
+                    Log.e(TAG, "Unhandled launch type: " + launchType.name());
+            }
         }
         
         stopSelf();
@@ -29,8 +58,10 @@ public class PowerService extends Service {
         return START_NOT_STICKY;
     }
     
-    private void launch() {
-        Log.i(TAG, "Launching com.android.deskclock.AlarmClock");
+    private void launchAutoClock() {
+        //TODO: Query for the other pre-installed clock apps.
+        
+        Log.i(TAG, "Launching com.android.deskclock.DeskClock");
         
         Intent clockIntent = new Intent();
         clockIntent.setClassName("com.android.deskclock", "com.android.deskclock.DeskClock");
