@@ -68,12 +68,16 @@ public class PowerService extends Service {
     }
     
     private void launchActivity(String packageName, String className) {
-        Log.i(TAG, "Launching " + packageName + ": " + className);
+        Log.i(TAG, "Launching " + packageName + '/' + className);
         
         Intent intent = new Intent();
         intent.setClassName(packageName, className);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        try {
+            startActivity(intent);
+        } catch (Exception ex) {
+            Log.e(TAG, "Unable to launch " + packageName + '/' + className + ": " + ex);
+        }
     }
 
 }
