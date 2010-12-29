@@ -16,16 +16,12 @@
 
 package org.lugatgt.org.zoogie.samdock;
 
-import java.util.List;
-
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+
 
 public class PrefsActivity extends PreferenceActivity {
     
@@ -35,54 +31,26 @@ public class PrefsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
         
-        ListPreference launchAppPref = (ListPreference)findPreference("launchType");
-        
-        LaunchType[] launchValues = LaunchType.values();
-        String[] launchValueValues = new String[launchValues.length];
-        for (int i = 0; i < launchValues.length; ++i) {
-            launchValueValues[i] = launchValues[i].getCode();
-        }
-        launchAppPref.setEntryValues(launchValueValues);
+        LaunchTypePreference launchAppPref = (LaunchTypePreference)findPreference("launchType");
+        launchAppPref.setPackageManager(getPackageManager());
         
         updateLaunchAppPrefSummary(launchAppPref, launchAppPref.getValue());
         launchAppPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                updateLaunchAppPrefSummary((ListPreference)preference, newValue.toString());
-                if (LaunchType.APP.getCode().equals(newValue)) {
-                    //TODO: Display the dialog to select the app.
+                if (newValue instanceof String) {
+                    updateLaunchAppPrefSummary((ListPreference)preference, (String)newValue);
                 }
                 return true;
             }
         });
     }
     
-    private List<ResolveInfo> findInstalledApps(PackageManager pkgMgr) {
-        Intent mainIntent = new Intent(Intent.ACTION_MAIN);
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        return pkgMgr.queryIntentActivities(mainIntent, 0);
-    }
-    
-    private void populateInstalledAppList(ListPreference pref) {
-        PackageManager pkgMgr = getBaseContext().getPackageManager();
-        List<ResolveInfo> installedApps = findInstalledApps(pkgMgr);
-        CharSequence[] names = new String[installedApps.size()];
-        CharSequence[] values = new String[installedApps.size()];
-        int i = 0;
-        for (ResolveInfo info : installedApps) {
-            names[i] = info.loadLabel(pkgMgr);
-            values[i] = info.activityInfo.packageName;
-            i++;
-        }
-        pref.setEntries(names);
-        pref.setEntryValues(values);
-    }
-    
     private void updateLaunchAppPrefSummary(ListPreference pref, String value) {
         CharSequence summary = "";
         if (LaunchType.APP.name().equals(value)) {
-            //TODO: Use the name.
-            summary = "(App name here)";
+            //TODO
+            summary = "";
         } else {
             LaunchType[] types = LaunchType.values();
             for (int i = 0; i < types.length; ++i) {
