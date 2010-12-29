@@ -30,6 +30,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
+import android.util.Log;
 
 
 /**
@@ -38,9 +39,13 @@ import android.util.AttributeSet;
  */
 public class LaunchTypePreference extends ListPreference {
 
+    private static final String TAG = "LaunchTypePreference";
+    
     private PackageManager packageManager;
     
     private String appLabelKey;
+    private String appPackageNameKey;
+    private String appActivityNameKey;
     
     private CharSequence[] appListLabels;
     private AppEntry[] appListValues;
@@ -69,6 +74,8 @@ public class LaunchTypePreference extends ListPreference {
         
         String key = getKey();
         appLabelKey = key + ".label";
+        appPackageNameKey = key + ".packageName";
+        appPackageNameKey = key + ".activityName";
     }
     
     // FIELD ACCESS ////////////////////////////////////////////////////////////
@@ -115,15 +122,22 @@ public class LaunchTypePreference extends ListPreference {
             return super.persistString(value);
         } else {
             ComplexValue newComplexValue =
-                new ComplexValue(LaunchType.fromCode(value), newAppEntry.getLabel());
+                new ComplexValue(LaunchType.fromCode(value),
+                    newAppEntry.getLabel(),
+                    newAppEntry.getInfo().activityInfo.packageName,
+                    newAppEntry.getInfo().activityInfo.name);
             
             // Persist new app entry, along with the launch type.
             SharedPreferences.Editor editor = getPreferenceManager().getSharedPreferences().edit();
             editor.putString(getKey(), value);
             editor.putString(appLabelKey, newComplexValue.getAppLabel());
+            editor.putString(appPackageNameKey, complexValue.getAppPackageName());
+            editor.putString(appActivityNameKey, complexValue.getAppActivityName());
             editor.commit();
             
             complexValue = newComplexValue;
+            
+            Log.i(TAG, "Selected activity is: " + complexValue);
             
             return true;
         }
@@ -135,7 +149,10 @@ public class LaunchTypePreference extends ListPreference {
         
         SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
         String appLabel = prefs.getString(appLabelKey, "");
-        complexValue = new ComplexValue(LaunchType.fromCode(getValue()), appLabel);
+        String appPackageName = prefs.getString(appPackageNameKey, "");
+        String appActivityName = prefs.getString(appActivityNameKey, "");
+        complexValue = new ComplexValue(LaunchType.fromCode(getValue()),
+            appLabel, appPackageName, appActivityName);
     }
     
     // APP LIST DIALOG /////////////////////////////////////////////////////////
@@ -206,7 +223,10 @@ public class LaunchTypePreference extends ListPreference {
     protected void onDismissAppListDialog() {
         if (newAppEntry != null) {
             ComplexValue newComplexValue =
-                new ComplexValue(LaunchType.fromCode(newLaunchType), newAppEntry.getLabel());
+                new ComplexValue(LaunchType.fromCode(newLaunchType),
+                    newAppEntry.getLabel(),
+                    newAppEntry.getInfo().activityInfo.packageName,
+                    newAppEntry.getInfo().activityInfo.name);
             
             if (callChangeListener(newComplexValue)) {
                 setValue(newLaunchType);
@@ -217,10 +237,16 @@ public class LaunchTypePreference extends ListPreference {
     public static class ComplexValue {
         private LaunchType launchType;
         private String appLabel;
+        private String appPackageName;
+        private String appActivityName;
         
-        public ComplexValue(LaunchType launchType, String appLabel) {
+        public ComplexValue(LaunchType launchType, String appLabel,
+            String appPackageName, String appActivityName)
+        {
             this.launchType = launchType;
             this.appLabel = appLabel;
+            this.appPackageName = appPackageName;
+            this.appActivityName = appActivityName;
         }
         
         public LaunchType getLaunchType() {
@@ -229,6 +255,24 @@ public class LaunchTypePreference extends ListPreference {
         
         public String getAppLabel() {
             return appLabel;
+        }
+        
+        public String getAppPackageName() {
+            return appPackageName;
+        }
+
+        public String getAppActivityName() {
+            return appActivityName;
+        }
+        
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "{" +
+                "launchType=" + getLaunchType() + ", " +
+                "appLabel=" + getAppLabel() + ", " +
+                "appPackageName=" + getAppPackageName() + ", " +
+                "appActivityName=" + getAppActivityName() +
+                "}";
         }
     }
     
