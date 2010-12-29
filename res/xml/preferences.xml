@@ -31,7 +31,8 @@
     <Preference
       android:title="@string/test_launch"
       android:summary="@string/test_launch_summary"
-      android:key="launchTest"/>
+      android:key="launchTest"
+      android:dependency="enabled"/>
   </PreferenceCategory>
   
 </PreferenceScreen>
