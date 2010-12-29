@@ -75,7 +75,7 @@ public class LaunchTypePreference extends ListPreference {
         String key = getKey();
         appLabelKey = key + ".label";
         appPackageNameKey = key + ".packageName";
-        appPackageNameKey = key + ".activityName";
+        appActivityNameKey = key + ".activityName";
     }
     
     // FIELD ACCESS ////////////////////////////////////////////////////////////
@@ -132,13 +132,14 @@ public class LaunchTypePreference extends ListPreference {
             SharedPreferences.Editor editor = getPreferenceManager().getSharedPreferences().edit();
             editor.putString(getKey(), value);
             editor.putString(appLabelKey, newComplexValue.getAppLabel());
-            editor.putString(appPackageNameKey, complexValue.getAppPackageName());
-            editor.putString(appActivityNameKey, complexValue.getAppActivityName());
-            editor.commit();
-            
-            complexValue = newComplexValue;
-            
-            Log.i(TAG, "Selected activity is: " + complexValue);
+            editor.putString(appPackageNameKey, newComplexValue.getAppPackageName());
+            editor.putString(appActivityNameKey, newComplexValue.getAppActivityName());
+            if (!editor.commit()) {
+                Log.e(TAG, "Failed to commit preferences: " + getKey());
+            } else {
+                complexValue = newComplexValue;
+                Log.i(TAG, "Selected activity is: " + complexValue);
+            }
             
             return true;
         }
