@@ -107,7 +107,8 @@ public class LaunchTypePreference extends ListPreference {
                 
                 return false;
             } else {
-                return super.callChangeListener(newValue);
+                return super.callChangeListener(new ComplexValue(
+                    LaunchType.fromCode((String)newValue)));
             }
         } else {
             // The app list dialog has been closed.
@@ -239,6 +240,10 @@ public class LaunchTypePreference extends ListPreference {
         private String appLabel;
         private String appPackageName;
         private String appActivityName;
+        
+        public ComplexValue(LaunchType launchType) {
+            this(launchType, "", "", "");
+        }
         
         public ComplexValue(LaunchType launchType, String appLabel,
             String appPackageName, String appActivityName)
