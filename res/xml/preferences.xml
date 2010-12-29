@@ -28,6 +28,10 @@
       android:key="launchType"
       android:defaultValue="AUTO_CLOCK"
       android:entries="@array/select_application_labels"/>
+    <Preference
+      android:title="@string/test_launch"
+      android:summary="@string/test_launch_summary"
+      android:key="launchTest"/>
   </PreferenceCategory>
   
 </PreferenceScreen>

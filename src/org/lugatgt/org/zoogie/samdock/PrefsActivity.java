@@ -16,10 +16,12 @@
 
 package org.lugatgt.org.zoogie.samdock;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 
 
@@ -45,6 +47,15 @@ public class PrefsActivity extends PreferenceActivity {
                 return true;
             }
         });
+        
+        Preference launchTestPref = findPreference("launchTest");
+        launchTestPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                launchApp();
+                return true;
+            }
+        });
     }
     
     private void updateLaunchAppPrefSummary(ListPreference pref, LaunchTypePreference.ComplexValue value) {
@@ -63,6 +74,10 @@ public class PrefsActivity extends PreferenceActivity {
         }
         
         pref.setSummary(summary);
+    }
+    
+    protected void launchApp() {
+        startService(new Intent(this, PowerService.class));
     }
     
 }
