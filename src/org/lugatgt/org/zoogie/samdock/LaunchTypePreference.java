@@ -17,6 +17,7 @@
 package org.lugatgt.org.zoogie.samdock;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -154,7 +155,16 @@ public class LaunchTypePreference extends ListPreference {
             for (ResolveInfo info : installedApps) {
                 appListValues[i++] = new AppEntry(packageManager, info);
             }
-            Arrays.sort(appListValues);
+            
+            final Comparator<ResolveInfo> riComp =
+                new ResolveInfo.DisplayNameComparator(packageManager);
+            
+            Arrays.sort(appListValues, new Comparator<AppEntry>() {
+                @Override
+                public int compare(AppEntry a, AppEntry b) {
+                    return riComp.compare(a.getInfo(), b.getInfo());
+                }
+            });
             
             appListLabels = new CharSequence[appListValues.length];
             for (i = 0; i < appListValues.length; ++i) {
@@ -222,7 +232,7 @@ public class LaunchTypePreference extends ListPreference {
         }
     }
     
-    protected static class AppEntry implements Comparable<AppEntry> {
+    protected static class AppEntry {
         private String label;
         private ResolveInfo info;
         
@@ -237,11 +247,6 @@ public class LaunchTypePreference extends ListPreference {
         
         public ResolveInfo getInfo() {
             return info;
-        }
-        
-        @Override
-        public int compareTo(AppEntry another) {
-            return label.compareToIgnoreCase(another.label);
         }
     }
     
