@@ -46,7 +46,10 @@ public class PowerService extends Service {
                     break;
                     
                 case APP:
-                    //TODO
+                    String packageName = prefs.getString("launchType.packageName", "");
+                    String activityName = prefs.getString("launchType.activityName", "");
+                    launchActivity(packageName, activityName);
+                    break;
                     
                 default:
                     Log.e(TAG, "Unhandled launch type: " + launchType.name());
@@ -61,12 +64,16 @@ public class PowerService extends Service {
     private void launchAutoClock() {
         //TODO: Query for the other pre-installed clock apps.
         
-        Log.i(TAG, "Launching com.android.deskclock.DeskClock");
+        launchActivity("com.android.deskclock", "com.android.deskclock.DeskClock");
+    }
+    
+    private void launchActivity(String packageName, String className) {
+        Log.i(TAG, "Launching " + packageName + ": " + className);
         
-        Intent clockIntent = new Intent();
-        clockIntent.setClassName("com.android.deskclock", "com.android.deskclock.DeskClock");
-        clockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(clockIntent);
+        Intent intent = new Intent();
+        intent.setClassName(packageName, className);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
 }
