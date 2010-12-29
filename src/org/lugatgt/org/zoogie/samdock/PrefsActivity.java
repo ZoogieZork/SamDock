@@ -34,27 +34,28 @@ public class PrefsActivity extends PreferenceActivity {
         LaunchTypePreference launchAppPref = (LaunchTypePreference)findPreference("launchType");
         launchAppPref.setPackageManager(getPackageManager());
         
-        updateLaunchAppPrefSummary(launchAppPref, launchAppPref.getValue());
+        updateLaunchAppPrefSummary(launchAppPref, launchAppPref.getComplexValue());
         launchAppPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if (newValue instanceof String) {
-                    updateLaunchAppPrefSummary((ListPreference)preference, (String)newValue);
+                if (newValue instanceof LaunchTypePreference.ComplexValue) {
+                    updateLaunchAppPrefSummary((ListPreference)preference,
+                        (LaunchTypePreference.ComplexValue)newValue);
                 }
                 return true;
             }
         });
     }
     
-    private void updateLaunchAppPrefSummary(ListPreference pref, String value) {
+    private void updateLaunchAppPrefSummary(ListPreference pref, LaunchTypePreference.ComplexValue value) {
         CharSequence summary = "";
-        if (LaunchType.APP.name().equals(value)) {
-            //TODO
-            summary = "";
+        LaunchType type = value.getLaunchType();
+        if (LaunchType.APP == type) {
+            summary = value.getAppLabel();
         } else {
             LaunchType[] types = LaunchType.values();
             for (int i = 0; i < types.length; ++i) {
-                if (types[i].getCode().equals(value)) {
+                if (types[i] == type) {
                     summary = pref.getEntries()[i];
                     break;
                 }

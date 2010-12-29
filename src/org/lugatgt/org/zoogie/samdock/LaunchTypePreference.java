@@ -24,6 +24,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.preference.ListPreference;
@@ -38,9 +39,13 @@ public class LaunchTypePreference extends ListPreference {
 
     private PackageManager packageManager;
     
+    private String appLabelKey;
+    
     private CharSequence[] appListLabels;
     private AppEntry[] appListValues;
     private Dialog appListDlg;
+    
+    private ComplexValue complexValue;
     
     private String newLaunchType;
     private AppEntry newAppEntry;
@@ -60,6 +65,9 @@ public class LaunchTypePreference extends ListPreference {
             launchValueValues[i] = launchValues[i].getCode();
         }
         setEntryValues(launchValueValues);
+        
+        String key = getKey();
+        appLabelKey = key + ".label";
     }
     
     // FIELD ACCESS ////////////////////////////////////////////////////////////
@@ -67,6 +75,12 @@ public class LaunchTypePreference extends ListPreference {
     public void setPackageManager(PackageManager packageManager) {
         this.packageManager = packageManager;
     }
+    
+    public ComplexValue getComplexValue() {
+        return complexValue;
+    }
+    
+    // ListPreference //////////////////////////////////////////////////////////
     
     @Override
     protected boolean callChangeListener(Object newValue) {
@@ -95,12 +109,32 @@ public class LaunchTypePreference extends ListPreference {
     
     @Override
     protected boolean persistString(String value) {
+        //HACK: Should refactor some of this into setComplexValue().
         if (newAppEntry == null) {
             return super.persistString(value);
         } else {
-            //TODO: Persist new app entry.
+            ComplexValue newComplexValue =
+                new ComplexValue(LaunchType.fromCode(value), newAppEntry.getLabel());
+            
+            // Persist new app entry, along with the launch type.
+            SharedPreferences.Editor editor = getPreferenceManager().getSharedPreferences().edit();
+            editor.putString(getKey(), value);
+            editor.putString(appLabelKey, newComplexValue.getAppLabel());
+            editor.commit();
+            
+            complexValue = newComplexValue;
+            
             return true;
         }
+    }
+    
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        super.onSetInitialValue(restoreValue, defaultValue);
+        
+        SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
+        String appLabel = prefs.getString(appLabelKey, "");
+        complexValue = new ComplexValue(LaunchType.fromCode(getValue()), appLabel);
     }
     
     // APP LIST DIALOG /////////////////////////////////////////////////////////
@@ -161,13 +195,34 @@ public class LaunchTypePreference extends ListPreference {
     
     protected void onDismissAppListDialog() {
         if (newAppEntry != null) {
-            if (callChangeListener(newAppEntry)) {
+            ComplexValue newComplexValue =
+                new ComplexValue(LaunchType.fromCode(newLaunchType), newAppEntry.getLabel());
+            
+            if (callChangeListener(newComplexValue)) {
                 setValue(newLaunchType);
             }
         }
     }
     
-    private static class AppEntry implements Comparable<AppEntry> {
+    public static class ComplexValue {
+        private LaunchType launchType;
+        private String appLabel;
+        
+        public ComplexValue(LaunchType launchType, String appLabel) {
+            this.launchType = launchType;
+            this.appLabel = appLabel;
+        }
+        
+        public LaunchType getLaunchType() {
+            return launchType;
+        }
+        
+        public String getAppLabel() {
+            return appLabel;
+        }
+    }
+    
+    protected static class AppEntry implements Comparable<AppEntry> {
         private String label;
         private ResolveInfo info;
         
