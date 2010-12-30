@@ -16,18 +16,11 @@
 
 package org.lugatgt.org.zoogie.samdock;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -40,8 +33,6 @@ import android.util.Log;
 public class LaunchTypePreference extends ListPreference {
 
     private static final String TAG = "LaunchTypePreference";
-    
-    private PackageManager packageManager;
     
     private String appLabelKey;
     private String appPackageNameKey;
@@ -79,10 +70,6 @@ public class LaunchTypePreference extends ListPreference {
     }
     
     // FIELD ACCESS ////////////////////////////////////////////////////////////
-    
-    public void setPackageManager(PackageManager packageManager) {
-        this.packageManager = packageManager;
-    }
     
     public ComplexValue getComplexValue() {
         return complexValue;

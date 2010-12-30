@@ -34,7 +34,6 @@ public class PrefsActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.preferences);
         
         LaunchTypePreference launchAppPref = (LaunchTypePreference)findPreference("launchType");
-        launchAppPref.setPackageManager(getPackageManager());
         
         updateLaunchAppPrefSummary(launchAppPref, launchAppPref.getComplexValue());
         launchAppPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
