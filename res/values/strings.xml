@@ -27,4 +27,7 @@
   </string-array>
   <string name="test_launch">Test</string>
   <string name="test_launch_summary">Tap to test launching the selected app</string>
+  
+  <string name="app_list_loader_message">Loading list of installed applications</string>
+  <string name="app_list_loader_cancel">Cancel</string>
 </resources>

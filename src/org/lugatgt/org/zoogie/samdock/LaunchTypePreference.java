@@ -99,11 +99,27 @@ public class LaunchTypePreference extends ListPreference {
                 // we need to ask the user what app they want.
                 newLaunchType = (String)newValue;
                 
+                // If the app list dialog hasn't been created yet, then
+                // load the list asynchronously and show the dialog when
+                // the task completes.
                 if (appListDlg == null) {
-                    appListDlg = createAppListDialog();
+                    new AppListLoader(getContext()) {
+                        @Override
+                        protected void onPostExecute(Void result) {
+                            if (!isCancelled()) {
+                                appListLabels = getAppListLabels();
+                                appListValues = getAppListValues();
+                                
+                                appListDlg = createAppListDialog();
+                                showAppListDialog();
+                            }
+                            
+                            super.onPostExecute(result);
+                        }
+                    }.execute((Void[])null);
+                } else {
+                    showAppListDialog();
                 }
-                newAppEntry = null;
-                appListDlg.show();
                 
                 return false;
             } else {
@@ -159,42 +175,7 @@ public class LaunchTypePreference extends ListPreference {
     
     // APP LIST DIALOG /////////////////////////////////////////////////////////
     
-    private List<ResolveInfo> findInstalledApps(PackageManager pkgMgr) {
-        Intent mainIntent = new Intent(Intent.ACTION_MAIN);
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        return pkgMgr.queryIntentActivities(mainIntent, 0);
-    }
-    
-    private void populateInstalledAppList() {
-        if (appListLabels == null) {
-            List<ResolveInfo> installedApps = findInstalledApps(packageManager);
-            
-            appListValues = new AppEntry[installedApps.size()];
-            int i = 0;
-            for (ResolveInfo info : installedApps) {
-                appListValues[i++] = new AppEntry(packageManager, info);
-            }
-            
-            final Comparator<ResolveInfo> riComp =
-                new ResolveInfo.DisplayNameComparator(packageManager);
-            
-            Arrays.sort(appListValues, new Comparator<AppEntry>() {
-                @Override
-                public int compare(AppEntry a, AppEntry b) {
-                    return riComp.compare(a.getInfo(), b.getInfo());
-                }
-            });
-            
-            appListLabels = new CharSequence[appListValues.length];
-            for (i = 0; i < appListValues.length; ++i) {
-                appListLabels[i] = appListValues[i].getLabel();
-            }
-        }
-    }
-    
     private Dialog createAppListDialog() {
-        populateInstalledAppList();
-        
         AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(getContext())
             .setTitle(getTitle())
             .setNegativeButton(getNegativeButtonText(), null)
@@ -214,6 +195,11 @@ public class LaunchTypePreference extends ListPreference {
             }
         });
         return dlg;
+    }
+    
+    protected void showAppListDialog() {
+        newAppEntry = null;
+        appListDlg.show();
     }
     
     protected void selectAppEntry(int index) {
@@ -279,24 +265,6 @@ public class LaunchTypePreference extends ListPreference {
                 "appPackageName=" + getAppPackageName() + ", " +
                 "appActivityName=" + getAppActivityName() +
                 "}";
-        }
-    }
-    
-    protected static class AppEntry {
-        private String label;
-        private ResolveInfo info;
-        
-        public AppEntry(PackageManager pkgMgr, ResolveInfo info) {
-            this.info = info;
-            this.label = info.loadLabel(pkgMgr).toString();
-        }
-        
-        public String getLabel() {
-            return label;
-        }
-        
-        public ResolveInfo getInfo() {
-            return info;
         }
     }
     
