@@ -29,6 +29,7 @@
   <string name="test_launch_summary">Tap to test launching the selected app</string>
   
   <string name="launch_details">Show Launch App Details</string>
+  <string name="launch_details_none">Error: Unable to determine which app to launch.</string>
   <string name="launch_details_msg">"Application to launch:\n\nTitle: %1$s\nPackage: %2$s\nClass: %3$s"</string>
   <string name="launch_details_cancel">OK</string>
   

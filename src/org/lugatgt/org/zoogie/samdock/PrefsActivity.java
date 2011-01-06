@@ -16,10 +16,15 @@
 
 package org.lugatgt.org.zoogie.samdock;
 
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -29,7 +34,6 @@ import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 
 public class PrefsActivity extends PreferenceActivity {
@@ -110,17 +114,35 @@ public class PrefsActivity extends PreferenceActivity {
     @Override
     protected void onPrepareDialog(int id, Dialog dlg) {
         switch (id) {
-            case DLG_LAUNCH_DETAILS: {
-                AlertDialog alertDlg = (AlertDialog)dlg;
-                alertDlg.setMessage(getString(R.string.launch_details_msg,
-                    "Title",
-                    "Package",
-                    "Class"));
+            case DLG_LAUNCH_DETAILS:
+                prepareLaunchDetailsDialog((AlertDialog)dlg);
                 break;
-            }
             
             default:
                 Log.e(TAG, "Unknown dialog ID to prepare: " + id);
+        }
+    }
+    
+    private void prepareLaunchDetailsDialog(AlertDialog dlg) {
+        
+        Intent intent = LaunchUtil.loadIntent(getPreferenceManager().getSharedPreferences());
+        if (intent == null) {
+            dlg.setMessage(getString(R.string.launch_details_none));
+            
+        } else {
+            PackageManager pkgMgr = getPackageManager();
+            List<ResolveInfo> results = pkgMgr.queryIntentActivities(intent, 0);
+            if (results.isEmpty()) {
+                dlg.setMessage(getString(R.string.launch_details_none));
+            } else {
+                //TODO: What if more than one activity matches?
+                ComponentName component = intent.getComponent();
+                dlg.setMessage(getString(R.string.launch_details_msg,
+                    results.get(0).loadLabel(pkgMgr),
+                    component.getPackageName(),
+                    component.getClassName()));
+            }
+            
         }
     }
     
