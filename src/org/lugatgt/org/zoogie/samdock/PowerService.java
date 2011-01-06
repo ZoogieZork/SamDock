@@ -37,22 +37,16 @@ public class PowerService extends Service {
         
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         if (prefs.getBoolean("enabled", true)) {
-            LaunchType launchType = LaunchType.fromCode(prefs.getString("launchType", null));
-            if (launchType == null) launchType = LaunchType.AUTO_CLOCK;
-            
-            switch (launchType) {
-                case AUTO_CLOCK:
-                    launchAutoClock();
-                    break;
-                    
-                case APP:
-                    String packageName = prefs.getString("launchType.packageName", "");
-                    String activityName = prefs.getString("launchType.activityName", "");
-                    launchActivity(packageName, activityName);
-                    break;
-                    
-                default:
-                    Log.e(TAG, "Unhandled launch type: " + launchType.name());
+            Intent launchIntent = LaunchUtil.loadIntent(prefs);
+            if (launchIntent == null) {
+                Log.e(TAG, "No intent configured; aborting.");
+            } else {
+                Log.i(TAG, "Launching " + launchIntent);
+                try {
+                    startActivity(launchIntent);
+                } catch (Exception ex) {
+                    Log.e(TAG, "Unable to launch " + launchIntent + ": " + ex);
+                }
             }
         }
         
@@ -61,23 +55,4 @@ public class PowerService extends Service {
         return START_NOT_STICKY;
     }
     
-    private void launchAutoClock() {
-        //TODO: Query for the other pre-installed clock apps.
-        
-        launchActivity("com.android.deskclock", "com.android.deskclock.DeskClock");
-    }
-    
-    private void launchActivity(String packageName, String className) {
-        Log.i(TAG, "Launching " + packageName + '/' + className);
-        
-        Intent intent = new Intent();
-        intent.setClassName(packageName, className);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            startActivity(intent);
-        } catch (Exception ex) {
-            Log.e(TAG, "Unable to launch " + packageName + '/' + className + ": " + ex);
-        }
-    }
-
 }
