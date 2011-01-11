@@ -166,7 +166,7 @@ public class LaunchTypePreference extends ListPreference {
         AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(getContext())
             .setTitle(getTitle())
             .setNegativeButton(getNegativeButtonText(), null)
-            .setSingleChoiceItems(appListLabels, -1, new DialogInterface.OnClickListener() {
+            .setSingleChoiceItems(new AppListAdapter(getContext(), appListLabels, appListValues), -1, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     selectAppEntry(which);
