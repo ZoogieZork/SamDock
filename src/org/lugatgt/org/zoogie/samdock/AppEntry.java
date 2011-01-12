@@ -18,19 +18,27 @@ package org.lugatgt.org.zoogie.samdock;
 
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 
 
 public class AppEntry {
     private String label;
+    private Drawable icon;
     private ResolveInfo info;
     
     public AppEntry(PackageManager pkgMgr, ResolveInfo info) {
         this.info = info;
-        this.label = info.loadLabel(pkgMgr).toString();
+        
+        icon = info.loadIcon(pkgMgr);
+        label = info.loadLabel(pkgMgr).toString();
     }
     
     public String getLabel() {
         return label;
+    }
+    
+    public Drawable getIcon() {
+        return icon;
     }
     
     public ResolveInfo getInfo() {

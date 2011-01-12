@@ -21,6 +21,7 @@ import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -71,14 +72,18 @@ public class AppListAdapter implements ListAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        TextView view;
+        View view;
         if (convertView == null) {
-            view = (TextView)inflater.inflate(R.layout.app_list_item, null);
+            view = inflater.inflate(R.layout.app_list_item, null);
         } else {
-            view = (TextView)convertView;
+            view = convertView;
         }
         
-        view.setText(appListLabels[position]);
+        ImageView iconView = (ImageView)view.findViewById(android.R.id.icon);
+        iconView.setImageDrawable(appListValues[position].getIcon());
+        
+        TextView labelView = (TextView)view.findViewById(android.R.id.text1);
+        labelView.setText(appListLabels[position]);
         
         return view;
     }
