@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.lugatgt.org.zoogie.samdock;
+package org.lugatgt.zoogie.samdock;
 
 
 public enum LaunchType {

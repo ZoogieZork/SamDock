@@ -23,7 +23,7 @@
     android:key="enabled"/>
     
   <PreferenceCategory android:title="@string/prefs_launch_title">
-    <org.lugatgt.org.zoogie.samdock.LaunchTypePreference
+    <org.lugatgt.zoogie.samdock.LaunchTypePreference
       android:title="@string/select_application"
       android:key="launchType"
       android:defaultValue="AUTO_CLOCK"

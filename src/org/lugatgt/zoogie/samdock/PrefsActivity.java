@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.lugatgt.org.zoogie.samdock;
+package org.lugatgt.zoogie.samdock;
 
 import java.util.List;
 

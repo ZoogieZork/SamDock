@@ -16,7 +16,7 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="org.lugatgt.org.zoogie.samdock"
+  package="org.lugatgt.zoogie.samdock"
   android:versionCode="2"
   android:versionName="1.1">
   

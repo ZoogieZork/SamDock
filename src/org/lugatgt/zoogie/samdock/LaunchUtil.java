@@ -1,4 +1,4 @@
-package org.lugatgt.org.zoogie.samdock;
+package org.lugatgt.zoogie.samdock;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
